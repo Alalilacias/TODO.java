@@ -1,23 +1,35 @@
 #!/usr/bin/env bash
 # Author: Alalilacias
 # Description: Script to automate git push, merge into main and branch deletion.
-# Version: 0.0.1
+# Version: 0.0.2
+
+set -euo pipefail
 
 main() {
-  local curbran="$(git simbolic-ref --short HEAD)"
+  local curbran
+  curbran="$(git symbolic-ref --short HEAD)"
 
-  # Copy diff to make conventional commit.
+  # Copy diff to clipboard (optional)
   git diff HEAD | xsel --clipboard --input
 
+  # Stage all changes
   git add -A
+
+  # Open editor for conventional commit
   GIT_EDITOR=nvim git commit -e
+
+  # Push and create remote branch
   git push --set-upstream origin "$curbran"
+
+  # Merge into main
   git checkout main
   git pull origin main
   git merge "$curbran"
+
+  # Push main and delete branch locally and remotely
   git push origin main
   git branch -d "$curbran"
   git push origin --delete "$curbran"
 }
 
-main $@
+main "$@"

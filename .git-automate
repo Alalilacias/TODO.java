@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Author: Alalilacias
-# Description: Script to automate git push, merge into main and branch deletion.
+# Description: Script to automate git push, merge into main and branch deletion. This will only work in my current setup. It should be updated if it is to be used in other machines.
 # Version: 0.0.2
 
-set -euo pipefail
-
 main() {
+  set -euo pipefail
+
   local curbran
   curbran="$(git symbolic-ref --short HEAD)"
 
@@ -32,4 +32,4 @@ main() {
   git push origin --delete "$curbran"
 }
 
-main "$@"
+main

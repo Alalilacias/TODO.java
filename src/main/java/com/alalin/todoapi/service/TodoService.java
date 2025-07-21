@@ -2,9 +2,9 @@ package com.alalin.todoapi.service;
 
 import com.alalin.todoapi.entity.Category;
 import com.alalin.todoapi.entity.Todo;
-import com.alalin.todoapi.exception.CategoryNotFoundException;
+import com.alalin.todoapi.entity.dtos.requests.CreateTodoRequest;
+import com.alalin.todoapi.entity.dtos.requests.UpdateTodoRequest;
 import com.alalin.todoapi.exception.TodoNotFoundException;
-import com.alalin.todoapi.repository.CategoryRepository;
 import com.alalin.todoapi.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,34 +18,32 @@ import java.util.List;
 public class TodoService {
 
     private final TodoRepository todoRepository;
-    private final CategoryRepository categoryRepository;
+    private final CategoryService categoryService;
 
-    public Todo createTodo(String title, String description, String categoryName, Todo.Priority priority) {
-        Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new CategoryNotFoundException("Category not found: " + categoryName));
+    public Todo createTodo(CreateTodoRequest request) {
+        Category category = categoryService.getCategoryByName(request.category());
 
         Todo todo = Todo.builder()
-                .title(title)
-                .description(description)
-                .priority(priority)
+                .title(request.title())
+                .description(request.description())
+                .priority(request.priority())
                 .category(category)
                 .build();
 
         return todoRepository.save(todo);
     }
 
-    public Todo updateTodo(Long id, String title, String description, boolean completed, String categoryName, Todo.Priority priority) {
+    public Todo updateTodo(Long id, UpdateTodoRequest request) {
         Todo todo = todoRepository.findById(id)
                 .orElseThrow(() -> new TodoNotFoundException(id));
 
-        todo.setTitle(title);
-        todo.setDescription(description);
-        todo.setCompleted(completed);
-        todo.setPriority(priority);
+        todo.setTitle(request.title());
+        todo.setDescription(request.description());
+        todo.setCompleted(request.completed());
+        todo.setPriority(request.priority());
 
-        if (categoryName != null) {
-            Category category = categoryRepository.findByName(categoryName)
-                    .orElseThrow(() -> new CategoryNotFoundException("Category not found: " + categoryName));
+        if (request.category() != null) {
+            Category category = categoryService.getCategoryByName(request.category());
             todo.setCategory(category);
         }
 

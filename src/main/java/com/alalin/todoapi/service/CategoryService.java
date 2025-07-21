@@ -38,5 +38,4 @@ public class CategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found: " + name));
         categoryRepository.delete(category);
     }
-
 }
